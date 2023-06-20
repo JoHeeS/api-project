@@ -1,85 +1,88 @@
-import React, { useEffect, useState, useMap} from 'react';
-import { Map, MapMarker} from 'react-kakao-maps-sdk';
+import React, { useState } from 'react';
+import { Map, MapMarker, useMap } from 'react-kakao-maps-sdk';
 
+export default function KakaoMap({ accidents }) {
+  const [filter, setFilter] = useState(null);
 
-
-export default function KakaoMap( { accidents }){
-    const MapDatas = accidents.map(accident =>{
-        return{
-            content: accident.ist_place,
-            latlng: { lat: accident.lat, lng: accident.lot}
-        }
-    })
-
-    const EventMarkerContainer = ({ MapDatas}) => {
-        const map = useMap()
-        const [isVisible, setIsVisible] = useState(false)
-
-        return(
-            <MapMarker
-                position={MapDatas.latlng}
-                onClick={(marker)=> map.panTo(marker.getPosition())}
-                onMouseOver={()=> setIsVisible(true)}
-                onMouseOut={()=> setIsVisible(false)}
-            >
-                {isVisible && MapDatas.content}
-            </MapMarker>
-        )
-
+  const filteredAccidents = accidents.filter((accident) => {
+    if (filter === '경인로') {
+      return (
+        accident.no === 10 ||
+        accident.no === 9 ||
+        accident.no === 6 ||
+        accident.no === 5
+      );
     }
+    if (filter === '한나루로') {
+      return accident.no === 8 || accident.no === 1;
+    }
+    if (filter === '인주대로') {
+      return (
+        accident.no === 2 ||
+        accident.no === 3 ||
+        accident.no === 7 ||
+        accident.no === 4
+      );
+    }
+    if (filter === '미추홀구') {
+      return true; 
+    }
+    return false;
+  });
 
-    console.log(MapDatas);
+  const MapDatas = accidents.map((accident) => {
+    return {
+      content: accident.ist_place,
+      latlng: { lat: accident.lat, lng: accident.lot },
+      num: accident.no,
+    };
+  });
 
-    return(
-        <Map
-            center = {{
-                lat: 37.450668,
-                lng: 126.687214,
-            }}
-            style={{
-                width: "100%",
-                height: "450px",
-            }}
-            level={5}
-        >
-            {MapDatas.map((MapData) =>(
-                <EventMarkerContainer
-                key={`EventMarkerContainer-${MapData.latlng.lat}-${MapData.latlng.lng}`}
-                position={MapData.latlng}
-                content={MapData.content}
-              />
-            ))}
-        </Map>
-    )
+  const EventMarkerContainer = ({ MapData }) => {
+    const map = useMap();
+    const [isVisible, setIsVisible] = useState(false);
 
-//     return(
-//         <Map
-//             center={{
-//                 lat: 37.450668,
-//                 lng: 126.687214,
-//             }}
-//             style={{
-//                 width: "100%",
-//                 height: "450px",
-//             }}
-//             level={5}
-//         >
-//             {MapDatas.map((MapData, index) =>(
-//                 <MapMarker
-//                     key = {`${MapData.title}-${MapData.latlng}`}
-//                     position={MapData.latlng}
-//                     image={{
-//                         src: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png", // 마커이미지의 주소입니다
-//                         size: {
-//                           width: 24,
-//                           height: 35
-//                         },
-//                     }}
+    return (
+      <MapMarker
+        position={MapData.latlng}
+        onMouseOver={() => setIsVisible(true)}
+        onMouseOut={() => setIsVisible(false)}
+      >
+        {isVisible && MapData.content}
+      </MapMarker>
+    );
+  };
 
-//                     title={MapData.title}
-//                 />
-//             ))}
-//         </Map>
-//     )
+  const handleFilterButtonClick = (filter) => {
+    setFilter(filter);
+  };
 
+  return (
+    <>
+    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+        <button onClick={() => handleFilterButtonClick('경인로')}>경인로</button>
+        <button onClick={() => handleFilterButtonClick('한나루로')}>한나루로</button>
+        <button onClick={() => handleFilterButtonClick('인주대로')}>인주대로</button>
+        <button onClick={() => handleFilterButtonClick('미추홀구')}>미추홀구</button>
+    </div>
+      <Map
+        center={{
+          lat: 37.45184,
+          lng: 126.6764592,
+        }}
+        style={{
+          width: '100%',
+          height: '450px',
+        }}
+        level={6}
+      >
+        {MapDatas.map((MapData) => (
+          <EventMarkerContainer
+            key={`EventMarkerContainer-${MapData.latlng.lat}-${MapData.latlng.lng}`}
+            MapData={MapData}
+          />
+        ))}
+      </Map>
+    </>
+  );
 }

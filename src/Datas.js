@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import Chart from './Chart';
 import KakaoMap from './Map'
@@ -68,7 +67,7 @@ export default function Datas() {
     var placeName = accidents[i].ist_place;
 
     if (placeName.indexOf("한나루로") > 0) {
-    // console.log(accidents[i].ist_place)
+
         chartData["한나루로"] ++;
     }
     if (placeName.indexOf("인주대로") > 0) {
@@ -79,14 +78,14 @@ export default function Datas() {
     }
   }
 
+  console.log(accidents);
+
   return (
     <>
-        <h1>App</h1>
-        <p>Total: {datas.response.totalCount}</p>
+        <h3 style={{ textAlign: 'center' }}>인천광역시 미추홀구_불법주정차단속CCTV</h3>
         <Chart chartData={chartData} />
         <KakaoMap accidents={datas.response.body.items.item} />
 
     </>
   )
 }
-
